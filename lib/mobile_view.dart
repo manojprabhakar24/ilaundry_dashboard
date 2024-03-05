@@ -9,32 +9,54 @@ class MobileScaffold extends StatefulWidget {
 
 class _MobileScaffoldState extends State<MobileScaffold> {
   bool isDrawerOpen = false;
+  int _currentPageIndex = 0;
+  late PageController _pageController;
 
   final List<DrawerItem> drawerItems = [
-    DrawerItem(icon: Icons.shopping_cart, title: 'Orders', onTap: () {
-      // Navigate to orders screen
-    }),
-    DrawerItem(icon: Icons.attach_money, title: 'Ready to Dispatch', onTap: () {
-      // Navigate to revenue & expense screen
-    }),
-    DrawerItem(icon: Icons.money, title: 'Billing & Changes', onTap: () {
-      // Navigate to billing & changes screen
-    }),
-    DrawerItem(icon: Icons.settings, title: 'Settings', onTap: () {
-      // Navigate to settings screen
-    }),
+    DrawerItem(
+      icon: Icons.shopping_cart,
+      title: 'Orders',
+      page: OrdersPage(),
+    ),
+    DrawerItem(
+      icon: Icons.attach_money,
+      title: 'Ready to Dispatch',
+      page: RevenueExpensePage(),
+    ),
+    DrawerItem(
+      icon: Icons.money,
+      title: 'Billing & Changes',
+      page: BillingChangesPage(),
+    ),
+    DrawerItem(
+      icon: Icons.settings,
+      title: 'Settings',
+      page: SettingsPage(),
+    ),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: _currentPageIndex);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.green, // Set app bar background color
-        elevation: 0, // Remove app bar elevation
+        backgroundColor: Colors.green,
+        elevation: 0,
         title: Text(
           'iLaundry',
           style: TextStyle(
-            color: Colors.white, // Set app bar title text color
+            color: Colors.white,
           ),
         ),
         leading: IconButton(
@@ -62,6 +84,15 @@ class _MobileScaffoldState extends State<MobileScaffold> {
       ),
       body: Stack(
         children: <Widget>[
+          PageView(
+            controller: _pageController,
+            onPageChanged: (index) {
+              setState(() {
+                _currentPageIndex = index;
+              });
+            },
+            children: drawerItems.map((item) => item.page).toList(),
+          ),
           if (isDrawerOpen)
             Positioned.fill(
               child: GestureDetector(
@@ -71,78 +102,74 @@ class _MobileScaffoldState extends State<MobileScaffold> {
                   });
                 },
                 child: Container(
-                  color: Colors.black26, // Add a semi-transparent color to overlay the entire screen
+                  color: Colors.black26,
                 ),
               ),
             ),
-          Positioned(
-            top: 0,
-            left: isDrawerOpen ? 0 : -MediaQuery.of(context).size.width * 0.8, // Slide the drawer out of the screen when closed
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width * 0.8, // Adjust the width of the drawer
-              height: MediaQuery.of(context).size.height, // Extend drawer to the end of the page
-              child: GestureDetector(
-                onTap: () {
-                  setState(() {
-                    isDrawerOpen = false;
-                  });
-                },
-                child: Container(
-                  color: Colors.white, // Set drawer background color
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.dashboard,
-                              color: Colors.green,
-                              size: 24,
-                            ),
-                            SizedBox(width: 8.0),
-                            Text(
-                              'Dashboard',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Divider(
-                        color: Colors.grey, // Set divider color
-                      ),
-                      // Create drawer items dynamically
-                      for (var item in drawerItems)
-                        ListTile(
-                          leading: Icon(
-                            item.icon,
+          if (isDrawerOpen)
+            Positioned(
+              top: 0,
+              left: 0,
+              bottom: 0,
+              width: MediaQuery.of(context).size.width * 0.8,
+              child: Container(
+                color: Colors.white,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.dashboard,
                             color: Colors.green,
+                            size: 24,
                           ),
-                          title: Text(
-                            item.title,
+                          SizedBox(width: 8.0),
+                          Text(
+                            'Dashboard',
                             style: TextStyle(
                               color: Colors.black,
-                              fontSize: 16,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                          onTap: () {
-                            setState(() {
-                              isDrawerOpen = false;
-                            });
-                            item.onTap();
-                          },
+                        ],
+                      ),
+                    ),
+                    Divider(
+                      color: Colors.grey,
+                    ),
+                    for (var i = 0; i < drawerItems.length; i++)
+                      ListTile(
+                        leading: Icon(
+                          drawerItems[i].icon,
+                          color: _currentPageIndex == i ? Colors.green : Colors.black,
                         ),
-                    ],
-                  ),
+                        title: Text(
+                          drawerItems[i].title,
+                          style: TextStyle(
+                            color: _currentPageIndex == i ? Colors.green : Colors.black,
+                            fontSize: 16,
+                          ),
+                        ),
+                        onTap: () {
+                          setState(() {
+                            _currentPageIndex = i;
+                            _pageController.animateToPage(
+                              i,
+                              duration: Duration(milliseconds: 300),
+                              curve: Curves.ease,
+                            );
+                            isDrawerOpen = false;
+                          });
+                        },
+                      ),
+                  ],
                 ),
               ),
             ),
-          ),
         ],
       ),
     );
@@ -152,7 +179,53 @@ class _MobileScaffoldState extends State<MobileScaffold> {
 class DrawerItem {
   final IconData icon;
   final String title;
-  final Function onTap;
+  final Widget page;
 
-  DrawerItem({required this.icon, required this.title, required this.onTap});
+  DrawerItem({required this.icon, required this.title, required this.page});
+}
+
+class OrdersPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    // Display order data
+    return Center(
+      child: Text('Orders Page'),
+    );
+  }
+}
+
+class RevenueExpensePage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    // Display revenue and expense data
+    return Center(
+      child: Text('Revenue & Expense Page'),
+    );
+  }
+}
+
+class BillingChangesPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    // Display billing and changes data
+    return Center(
+      child: Text('Billing & Changes Page'),
+    );
+  }
+}
+
+class SettingsPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    // Display settings data
+    return Center(
+      child: Text('Settings Page'),
+    );
+  }
+}
+
+void main() {
+  runApp(MaterialApp(
+    home: MobileScaffold(),
+  ));
 }
