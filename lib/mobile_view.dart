@@ -29,7 +29,7 @@ class _MobileScaffoldState extends State<MobileScaffold> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.blue, // Set app bar background color
+        backgroundColor: Colors.green, // Set app bar background color
         elevation: 0, // Remove app bar elevation
         title: Text(
           'iLaundry',
