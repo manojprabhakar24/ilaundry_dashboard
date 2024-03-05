@@ -9,9 +9,7 @@ class MobileScaffold extends StatefulWidget {
 
 class _MobileScaffoldState extends State<MobileScaffold> {
   bool isDrawerOpen = false;
-  bool isHovered = false; // Flag to track cursor hover
 
-  // List of drawer items
   final List<DrawerItem> drawerItems = [
     DrawerItem(icon: Icons.shopping_cart, title: 'Orders', onTap: () {
       // Navigate to orders screen
@@ -30,80 +28,121 @@ class _MobileScaffoldState extends State<MobileScaffold> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.blue, // Set app bar background color
+        elevation: 0, // Remove app bar elevation
+        title: Text(
+          'iLaundry',
+          style: TextStyle(
+            color: Colors.white, // Set app bar title text color
+          ),
+        ),
+        leading: IconButton(
+          icon: Icon(Icons.menu),
+          onPressed: () {
+            setState(() {
+              isDrawerOpen = !isDrawerOpen;
+            });
+          },
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.search),
+            onPressed: () {
+              // Implement search functionality
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.notifications),
+            onPressed: () {
+              // Implement notification functionality
+            },
+          ),
+        ],
+      ),
       body: Stack(
         children: <Widget>[
-          Positioned(
-            top: 16.0,
-            left: 16.0,
-            child: IconButton(
-              icon: Image.asset(
-                'assets/i.png',
-                height: 40,
-                width: 30,
-              ),
-              color: Colors.white,
-              onPressed: () {
-                setState(() {
-                  isDrawerOpen = !isDrawerOpen;
-                });
-              },
-            ),
-          ),
           if (isDrawerOpen)
-            Align(
-              alignment: Alignment.topLeft,
-              child: Container(
-                width: MediaQuery.of(context).size.width * 0.4, // Adjust the width here
-                child: Drawer(
-                  child: Container(
-                    color: Colors.white, // Set the background color to white
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.dashboard,
-                                color: Colors.green, // Set icon color to green
-                                size: 24,
-                              ),
-                              SizedBox(width: 8.0),
-                              Text(
-                                'Dashboard',
-                                style: TextStyle(
-                                  color: Colors.black, // Set text color to black
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Divider(),
-                        // Create drawer items dynamically
-                        for (var item in drawerItems)
-                          ListTile(
-                            leading: Icon(
-                              item.icon,
-                              color: Colors.green, // Set icon color to green
+            Positioned.fill(
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    isDrawerOpen = false;
+                  });
+                },
+                child: Container(
+                  color: Colors.black26, // Add a semi-transparent color to overlay the entire screen
+                ),
+              ),
+            ),
+          Positioned(
+            top: 0,
+            left: isDrawerOpen ? 0 : -MediaQuery.of(context).size.width * 0.8, // Slide the drawer out of the screen when closed
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width * 0.8, // Adjust the width of the drawer
+              height: MediaQuery.of(context).size.height, // Extend drawer to the end of the page
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    isDrawerOpen = false;
+                  });
+                },
+                child: Container(
+                  color: Colors.white, // Set drawer background color
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.dashboard,
+                              color: Colors.green,
+                              size: 24,
                             ),
-                            title: Text(
-                              item.title,
+                            SizedBox(width: 8.0),
+                            Text(
+                              'Dashboard',
                               style: TextStyle(
-                                color: Colors.black, // Set text color to black
-                                fontSize: 18,
+                                color: Colors.black,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                            onTap: item.onTap as void Function()?,
+                          ],
+                        ),
+                      ),
+                      Divider(
+                        color: Colors.grey, // Set divider color
+                      ),
+                      // Create drawer items dynamically
+                      for (var item in drawerItems)
+                        ListTile(
+                          leading: Icon(
+                            item.icon,
+                            color: Colors.green,
                           ),
-                      ],
-                    ),
+                          title: Text(
+                            item.title,
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 16,
+                            ),
+                          ),
+                          onTap: () {
+                            setState(() {
+                              isDrawerOpen = false;
+                            });
+                            item.onTap();
+                          },
+                        ),
+                    ],
                   ),
                 ),
               ),
             ),
+          ),
         ],
       ),
     );
