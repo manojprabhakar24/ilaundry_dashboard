@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'mobile_view.dart';
+
 class TabletScaffold extends StatefulWidget {
   const TabletScaffold({Key? key}) : super(key: key);
 
@@ -8,6 +10,14 @@ class TabletScaffold extends StatefulWidget {
 }
 
 class _TabletScaffoldState extends State<TabletScaffold> {
+  var tilePadding = const EdgeInsets.only(left: 8.0, right: 8, top: 8);
+  bool showDashboard = false;
+  bool showHistory = false;
+  int selectedStylist = 0;
+  Color dashboardButtonColor = Colors.blue;
+
+  // List of drawer items
+  bool isDrawerOpen = true; // Open the drawer by default
   int _currentPageIndex = 0;
   late PageController _pageController;
 
@@ -78,30 +88,55 @@ class _TabletScaffoldState extends State<TabletScaffold> {
       body: Row(
         children: <Widget>[
           // Drawer
-          Drawer(
-            child: ListView.builder(
-              itemCount: drawerItems.length,
-              itemBuilder: (context, index) {
-                final item = drawerItems[index];
-                return ListTile(
-                  leading: Icon(
-                    item.icon,
-                    color: _currentPageIndex == index ? Colors.green : Colors.black,
+          Container(
+            width: MediaQuery.of(context).size.width * 0.3, // 20% width of screen
+            color: Colors.white,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.dashboard,
+                        color: Colors.green,
+                        size: 24,
+                      ),
+                      SizedBox(width: 8.0),
+                      Text(
+                        'Dashboard',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
-                  title: index == 0 ? _buildOrdersTileTitle(item) : Text(item.title),
-                  onTap: () {
-                    setState(() {
-                      _currentPageIndex = index;
-                      _pageController.animateToPage(
-                        index,
-                        duration: Duration(milliseconds: 300),
-                        curve: Curves.ease,
-                      );
-                    });
-                    Navigator.pop(context); // Close the drawer
-                  },
-                );
-              },
+                ),
+                Divider(
+                  color: Colors.grey,
+                ),
+                for (var i = 0; i < drawerItems.length; i++)
+                  ListTile(
+                    leading: Icon(
+                      drawerItems[i].icon,
+                      color: _currentPageIndex == i ? Colors.green : Colors.black,
+                    ),
+                    title: i == 0 ? _buildOrdersTileTitle(drawerItems[i]) : Text(drawerItems[i].title),
+                    onTap: () {
+                      setState(() {
+                        _currentPageIndex = i;
+                        _pageController.animateToPage(
+                          i,
+                          duration: Duration(milliseconds: 300),
+                          curve: Curves.ease,
+                        );
+                      });
+                    },
+                  ),
+              ],
             ),
           ),
           // Page content
@@ -126,20 +161,19 @@ class _TabletScaffoldState extends State<TabletScaffold> {
       children: [
         Text(item.title),
         SizedBox(width: 16), // Add some space between the text and the notification count
-        if (item.notificationCount != null)
-          Container(
-            padding: EdgeInsets.all(4),
-            decoration: BoxDecoration(
-              color: Colors.green,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              item.notificationCount!.toString(),
-              style: TextStyle(
-                color: Colors.white,
-              ),
+        Container(
+          padding: EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            color: Colors.green,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Text(
+            item.notificationCount.toString(),
+            style: TextStyle(
+              color: Colors.white,
             ),
           ),
+        ),
       ],
     );
   }
@@ -180,16 +214,6 @@ class SettingsPage extends StatelessWidget {
     // Display settings data
     return Center(
       child: Text('Settings Page'),
-    );
-  }
-}
-
-class OrdersPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    // Display orders data
-    return Center(
-      child: Text('Orders Page'),
     );
   }
 }

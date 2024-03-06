@@ -17,6 +17,7 @@ class _MobileScaffoldState extends State<MobileScaffold> {
       icon: Icons.shopping_cart,
       title: 'Orders',
       page: OrdersPage(),
+      notificationCount: 5, // Example: set the notification count to 5
     ),
     DrawerItem(
       icon: Icons.attach_money,
@@ -27,6 +28,7 @@ class _MobileScaffoldState extends State<MobileScaffold> {
       icon: Icons.money,
       title: 'Billing & Changes',
       page: BillingChangesPage(),
+      notificationCount: 3, // Example: set the notification count to 3
     ),
     DrawerItem(
       icon: Icons.settings,
@@ -111,7 +113,7 @@ class _MobileScaffoldState extends State<MobileScaffold> {
               top: 0,
               left: 0,
               bottom: 0,
-              width: MediaQuery.of(context).size.width * 0.8,
+              width: MediaQuery.of(context).size.width * 0.48,
               child: Container(
                 color: Colors.white,
                 child: Column(
@@ -147,12 +149,32 @@ class _MobileScaffoldState extends State<MobileScaffold> {
                           drawerItems[i].icon,
                           color: _currentPageIndex == i ? Colors.green : Colors.black,
                         ),
-                        title: Text(
-                          drawerItems[i].title,
-                          style: TextStyle(
-                            color: _currentPageIndex == i ? Colors.green : Colors.black,
-                            fontSize: 16,
-                          ),
+                        title: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              drawerItems[i].title,
+                              style: TextStyle(
+                                color: _currentPageIndex == i ? Colors.green : Colors.black,
+                                fontSize: 16,
+                              ),
+                            ),
+                            if (drawerItems[i].notificationCount != null && drawerItems[i].notificationCount! > 0)
+                              Container(
+                                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: Colors.green,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Text(
+                                  drawerItems[i].notificationCount!.toString(),
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                          ],
                         ),
                         onTap: () {
                           setState(() {
@@ -180,12 +202,13 @@ class DrawerItem {
   final IconData icon;
   final String title;
   final Widget page;
+  final int? notificationCount;
 
-  DrawerItem({required this.icon, required this.title, required this.page});
+  DrawerItem({required this.icon, required this.title, required this.page, this.notificationCount});
 }
 
 class OrdersPage extends StatelessWidget {
-  @override
+   @override
   Widget build(BuildContext context) {
     // Display order data
     return Center(
@@ -215,17 +238,11 @@ class BillingChangesPage extends StatelessWidget {
 }
 
 class SettingsPage extends StatelessWidget {
-  @override
+  @ override
   Widget build(BuildContext context) {
     // Display settings data
     return Center(
       child: Text('Settings Page'),
     );
   }
-}
-
-void main() {
-  runApp(MaterialApp(
-    home: MobileScaffold(),
-  ));
 }
