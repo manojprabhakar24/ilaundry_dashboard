@@ -11,13 +11,15 @@ class _MobileScaffoldState extends State<MobileScaffold> {
   bool isDrawerOpen = false;
   int _currentPageIndex = 0;
   late PageController _pageController;
+  TextEditingController _searchController = TextEditingController();
+  bool _isSearching = false;
 
   final List<DrawerItem> drawerItems = [
     DrawerItem(
       icon: Icons.shopping_cart,
       title: 'Orders',
       page: OrdersPage(),
-      notificationCount: 5, // Example: set the notification count to 5
+      notificationCount: 5,
     ),
     DrawerItem(
       icon: Icons.attach_money,
@@ -28,7 +30,7 @@ class _MobileScaffoldState extends State<MobileScaffold> {
       icon: Icons.money,
       title: 'Billing & Changes',
       page: BillingChangesPage(),
-      notificationCount: 3, // Example: set the notification count to 3
+      notificationCount: 3,
     ),
     DrawerItem(
       icon: Icons.settings,
@@ -46,44 +48,14 @@ class _MobileScaffoldState extends State<MobileScaffold> {
   @override
   void dispose() {
     _pageController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.green,
-        elevation: 0,
-        title: Text(
-          'iLaundry',
-          style: TextStyle(
-            color: Colors.white,
-          ),
-        ),
-        leading: IconButton(
-          icon: Icon(Icons.menu),
-          onPressed: () {
-            setState(() {
-              isDrawerOpen = !isDrawerOpen;
-            });
-          },
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.search),
-            onPressed: () {
-              // Implement search functionality
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.notifications),
-            onPressed: () {
-              // Implement notification functionality
-            },
-          ),
-        ],
-      ),
+      appBar: _isSearching ? _buildSearchAppBar() : _buildDefaultAppBar(),
       body: Stack(
         children: <Widget>[
           PageView(
@@ -113,7 +85,10 @@ class _MobileScaffoldState extends State<MobileScaffold> {
               top: 0,
               left: 0,
               bottom: 0,
-              width: MediaQuery.of(context).size.width * 0.48,
+              width: MediaQuery
+                  .of(context)
+                  .size
+                  .width * 0.6,
               child: Container(
                 color: Colors.white,
                 child: Column(
@@ -147,7 +122,8 @@ class _MobileScaffoldState extends State<MobileScaffold> {
                       ListTile(
                         leading: Icon(
                           drawerItems[i].icon,
-                          color: _currentPageIndex == i ? Colors.green : Colors.black,
+                          color: _currentPageIndex == i ? Colors.green : Colors
+                              .black,
                         ),
                         title: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -155,13 +131,17 @@ class _MobileScaffoldState extends State<MobileScaffold> {
                             Text(
                               drawerItems[i].title,
                               style: TextStyle(
-                                color: _currentPageIndex == i ? Colors.green : Colors.black,
+                                color: _currentPageIndex == i
+                                    ? Colors.green
+                                    : Colors.black,
                                 fontSize: 16,
                               ),
                             ),
-                            if (drawerItems[i].notificationCount != null && drawerItems[i].notificationCount! > 0)
+                            if (drawerItems[i].notificationCount != null &&
+                                drawerItems[i].notificationCount! > 0)
                               Container(
-                                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 4),
                                 decoration: BoxDecoration(
                                   color: Colors.green,
                                   borderRadius: BorderRadius.circular(10),
@@ -196,6 +176,79 @@ class _MobileScaffoldState extends State<MobileScaffold> {
       ),
     );
   }
+
+  AppBar _buildDefaultAppBar() {
+    return AppBar(
+      centerTitle: true,
+      backgroundColor: Colors.green,
+      elevation: 0,
+      title: Text(
+        'iLaundry',
+        style: TextStyle(
+          color: Colors.white,
+        ),
+      ),
+      leading: IconButton(
+        icon: Icon(Icons.menu),
+        onPressed: () {
+          setState(() {
+            isDrawerOpen = !isDrawerOpen;
+          });
+        },
+      ),
+      actions: [
+        IconButton(
+          icon: Icon(Icons.search),
+          onPressed: () {
+            setState(() {
+              _isSearching = true;
+            });
+          },
+        ),
+        IconButton(
+          icon: Icon(Icons.notifications),
+          onPressed: () {
+            // Implement notification functionality
+          },
+        ),
+      ],
+    );
+  }
+
+  AppBar _buildSearchAppBar() {
+    return AppBar(
+      centerTitle: true,
+      backgroundColor: Colors.green,
+      elevation: 0,
+      title: TextField(
+        controller: _searchController,
+        autofocus: true,
+        decoration: InputDecoration(
+          hintText: 'Search...',
+          hintStyle: TextStyle(color: Colors.white),
+          border: InputBorder.none,
+          suffixIcon: IconButton(
+            icon: Icon(Icons.clear),
+            onPressed: () {
+              setState(() {
+                _searchController.clear();
+              });
+            },
+          ),
+        ),
+        style: TextStyle(color: Colors.white),
+      ),
+      leading: IconButton(
+        icon: Icon(Icons.arrow_back),
+        onPressed: () {
+          setState(() {
+            _isSearching = false;
+            _searchController.clear();
+          });
+        },
+      ),
+    );
+  }
 }
 
 class DrawerItem {
@@ -208,9 +261,8 @@ class DrawerItem {
 }
 
 class OrdersPage extends StatelessWidget {
-   @override
+  @override
   Widget build(BuildContext context) {
-    // Display order data
     return Center(
       child: Text('Orders Page'),
     );
@@ -220,7 +272,6 @@ class OrdersPage extends StatelessWidget {
 class RevenueExpensePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // Display revenue and expense data
     return Center(
       child: Text('Revenue & Expense Page'),
     );
@@ -230,7 +281,6 @@ class RevenueExpensePage extends StatelessWidget {
 class BillingChangesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // Display billing and changes data
     return Center(
       child: Text('Billing & Changes Page'),
     );
@@ -238,9 +288,8 @@ class BillingChangesPage extends StatelessWidget {
 }
 
 class SettingsPage extends StatelessWidget {
-  @ override
+  @override
   Widget build(BuildContext context) {
-    // Display settings data
     return Center(
       child: Text('Settings Page'),
     );
