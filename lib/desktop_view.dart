@@ -16,8 +16,7 @@ class _DesktopScaffoldState extends State<DesktopScaffold> {
   bool showHistory = false;
   int selectedStylist = 0;
   Color dashboardButtonColor = Colors.blue;
-  TextEditingController _searchController = TextEditingController();
-  bool _isSearching = false;
+
   // List of drawer items
   bool isDrawerOpen = true; // Open the drawer by default
   int _currentPageIndex = 0;
@@ -59,202 +58,124 @@ class _DesktopScaffoldState extends State<DesktopScaffold> {
     super.dispose();
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _isSearching ? _buildSearchAppBar() : _buildDefaultAppBar(),
-      body: Stack(
-        children: <Widget>[
-          PageView(
-            controller: _pageController,
-            onPageChanged: (index) {
-              setState(() {
-                _currentPageIndex = index;
-              });
-            },
-            children: drawerItems.map((item) => item.page).toList(),
+      appBar: AppBar(
+        backgroundColor: Colors.green,
+        elevation: 0,
+        title: Text(
+          'iLaundry',
+          style: TextStyle(
+            color: Colors.white,
           ),
-          if (isDrawerOpen)
-            Positioned.fill(
-              child: GestureDetector(
-                onTap: () {
-                  setState(() {
-                    isDrawerOpen = false;
-                  });
-                },
-                child: Container(
-                  color: Colors.black26,
-                ),
-              ),
-            ),
-          if (isDrawerOpen)
-            Positioned(
-              top: 0,
-              left: 0,
-              bottom: 0,
-              width: MediaQuery
-                  .of(context)
-                  .size
-                  .width * 0.2,
-              child: Container(
-                color: Colors.white,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.dashboard,
-                            color: Colors.green,
-                            size: 24,
-                          ),
-                          SizedBox(width: 8.0),
-                          Text(
-                            'Dashboard',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
+        ),
+        leading: Image.asset('assets/i.png'), // Replace 'your_image.png' with your image path
+        actions: [
+          IconButton(
+            icon: Icon(Icons.search),
+            onPressed: () {
+              // Implement search functionality
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.notifications),
+            onPressed: () {
+              // Implement notification functionality
+            },
+          ),
+        ],
+      ),
+      body: Row(
+        children: <Widget>[
+          // Drawer
+          Container(
+            width: MediaQuery.of(context).size.width * 0.2, // 20% width of screen
+            color: Colors.white,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.dashboard,
+                        color: Colors.green,
+                        size: 24,
                       ),
-                    ),
-                    Divider(
-                      color: Colors.grey,
-                    ),
-                    for (var i = 0; i < drawerItems.length; i++)
-                      ListTile(
-                        leading: Icon(
-                          drawerItems[i].icon,
-                          color: _currentPageIndex == i ? Colors.green : Colors
-                              .black,
+                      SizedBox(width: 8.0),
+                      Text(
+                        'Dashboard',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
                         ),
-                        title: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              drawerItems[i].title,
-                              style: TextStyle(
-                                color: _currentPageIndex == i
-                                    ? Colors.green
-                                    : Colors.black,
-                                fontSize: 16,
-                              ),
-                            ),
-                            if (drawerItems[i].notificationCount != null &&
-                                drawerItems[i].notificationCount! > 0)
-                              Container(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: Colors.green,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Text(
-                                  drawerItems[i].notificationCount!.toString(),
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
-                        onTap: () {
-                          setState(() {
-                            _currentPageIndex = i;
-                            _pageController.animateToPage(
-                              i,
-                              duration: Duration(milliseconds: 300),
-                              curve: Curves.ease,
-                            );
-                            isDrawerOpen = false;
-                          });
-                        },
                       ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
+                Divider(
+                  color: Colors.grey,
+                ),
+                for (var i = 0; i < drawerItems.length; i++)
+                  ListTile(
+                    leading: Icon(
+                      drawerItems[i].icon,
+                      color: _currentPageIndex == i ? Colors.green : Colors.black,
+                    ),
+                    title: i == 0 ? _buildOrdersTileTitle(drawerItems[i]) : Text(drawerItems[i].title),
+                    onTap: () {
+                      setState(() {
+                        _currentPageIndex = i;
+                        _pageController.animateToPage(
+                          i,
+                          duration: Duration(milliseconds: 300),
+                          curve: Curves.ease,
+                        );
+                      });
+                    },
+                  ),
+              ],
             ),
+          ),
+          // Page content
+          Expanded(
+            child: PageView(
+              controller: _pageController,
+              onPageChanged: (index) {
+                setState(() {
+                  _currentPageIndex = index;
+                });
+              },
+              children: drawerItems.map((item) => item.page).toList(),
+            ),
+          ),
         ],
       ),
     );
   }
 
-  AppBar _buildDefaultAppBar() {
-    return AppBar(
-      centerTitle: true,
-      backgroundColor: Colors.green,
-      elevation: 0,
-      title: Text(
-        'iLaundry',
-        style: TextStyle(
-          color: Colors.white,
-        ),
-      ),
-      leading: IconButton(
-        icon: Icon(Icons.menu),
-        onPressed: () {
-          setState(() {
-            isDrawerOpen = !isDrawerOpen;
-          });
-        },
-      ),
-      actions: [
-        IconButton(
-          icon: Icon(Icons.search),
-          onPressed: () {
-            setState(() {
-              _isSearching = true;
-            });
-          },
-        ),
-        IconButton(
-          icon: Icon(Icons.notifications),
-          onPressed: () {
-            // Implement notification functionality
-          },
-        ),
-      ],
-    );
-  }
-
-  AppBar _buildSearchAppBar() {
-    return AppBar(
-      centerTitle: true,
-      backgroundColor: Colors.green,
-      elevation: 0,
-      title: TextField(
-        controller: _searchController,
-        autofocus: true,
-        decoration: InputDecoration(
-          hintText: 'Search...',
-          hintStyle: TextStyle(color: Colors.white),
-          border: InputBorder.none,
-          suffixIcon: IconButton(
-            icon: Icon(Icons.clear),
-            onPressed: () {
-              setState(() {
-                _searchController.clear();
-              });
-            },
+  Widget _buildOrdersTileTitle(DrawerItem item) {
+    return Row(
+      children: [
+        Text(item.title),
+        SizedBox(width: 16), // Add some space between the text and the notification count
+        Container(
+          padding: EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            color: Colors.green,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Text(
+            item.notificationCount.toString(),
+            style: TextStyle(
+              color: Colors.white,
+            ),
           ),
         ),
-        style: TextStyle(color: Colors.white),
-      ),
-      leading: IconButton(
-        icon: Icon(Icons.arrow_back),
-        onPressed: () {
-          setState(() {
-            _isSearching = false;
-            _searchController.clear();
-          });
-        },
-      ),
+      ],
     );
   }
 }
@@ -268,18 +189,10 @@ class DrawerItem {
   DrawerItem({required this.icon, required this.title, required this.page, this.notificationCount});
 }
 
-class OrdersPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text('Orders Page'),
-    );
-  }
-}
-
 class RevenueExpensePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    // Display revenue and expense data
     return Center(
       child: Text('Revenue & Expense Page'),
     );
@@ -289,6 +202,7 @@ class RevenueExpensePage extends StatelessWidget {
 class BillingChangesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    // Display billing and changes data
     return Center(
       child: Text('Billing & Changes Page'),
     );
@@ -298,6 +212,7 @@ class BillingChangesPage extends StatelessWidget {
 class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    // Display settings data
     return Center(
       child: Text('Settings Page'),
     );
