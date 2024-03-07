@@ -61,85 +61,61 @@ class _DesktopScaffoldState extends State<DesktopScaffold> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.green,
-        elevation: 0,
-        title: Text(
-          'iLaundry',
-          style: TextStyle(
-            color: Colors.white,
-          ),
-        ),
-        leading: Image.asset('assets/i.png'), // Replace 'your_image.png' with your image path
-        actions: [
-          IconButton(
-            icon: Icon(Icons.search),
-            onPressed: () {
-              // Implement search functionality
-            },
-          ),
-          IconButton(
-            icon: Icon(Icons.notifications),
-            onPressed: () {
-              // Implement notification functionality
-            },
-          ),
-        ],
-      ),
       body: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          // Drawer
+          // Image container and drawer
           Container(
+            decoration: BoxDecoration(
+              color: Colors.greenAccent,
+              borderRadius: BorderRadius.only(
+                topRight: Radius.circular(20.0),
+                topLeft: Radius.circular(20.0),
+                bottomLeft: Radius.circular(20.0),
+                bottomRight: Radius.circular(20.0),
+              ),
+            ),
             width: MediaQuery.of(context).size.width * 0.2, // 20% width of screen
-            color: Colors.white,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
+              children: [
                 Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.dashboard,
-                        color: Colors.green,
-                        size: 24,
-                      ),
-                      SizedBox(width: 8.0),
-                      Text(
-                        'Dashboard',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
+                  child: Image.asset(
+                    'assets/logo.png',
+                    width: 100,
                   ),
                 ),
-                Divider(
-                  color: Colors.grey,
-                ),
-                for (var i = 0; i < drawerItems.length; i++)
-                  ListTile(
-                    leading: Icon(
-                      drawerItems[i].icon,
-                      color: _currentPageIndex == i ? Colors.green : Colors.black,
-                    ),
-                    title: i == 0 ? _buildOrdersTileTitle(drawerItems[i]) : Text(drawerItems[i].title),
-                    onTap: () {
-                      setState(() {
-                        _currentPageIndex = i;
-                        _pageController.animateToPage(
-                          i,
-                          duration: Duration(milliseconds: 300),
-                          curve: Curves.ease,
-                        );
-                      });
+                Divider(thickness: 5),
+                // Drawer items
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: drawerItems.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return ListTile(
+                        leading: Icon(
+                          drawerItems[index].icon,
+                          color: _currentPageIndex == index ? Colors.green : Colors.black,
+                        ),
+                        title: index == 0 ? _buildOrdersTileTitle(drawerItems[index]) : Text(drawerItems[index].title),
+                        onTap: () {
+                          setState(() {
+                            _currentPageIndex = index;
+                            _pageController.animateToPage(
+                              index,
+                              duration: Duration(milliseconds: 300),
+                              curve: Curves.ease,
+                            );
+                          });
+                        },
+                      );
                     },
                   ),
+                ),
               ],
             ),
           ),
+
           // Page content
           Expanded(
             child: PageView(

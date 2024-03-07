@@ -180,7 +180,7 @@ class _MobileScaffoldState extends State<MobileScaffold> {
   AppBar _buildDefaultAppBar() {
     return AppBar(
       centerTitle: true,
-      backgroundColor: Colors.green,
+      backgroundColor: Colors.orange,
       elevation: 0,
       title: Text(
         'iLaundry',
